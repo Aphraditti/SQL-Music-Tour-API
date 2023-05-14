@@ -14,12 +14,24 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   stage_event.init({
-    id: DataTypes.INTEGER,
-    stageId: DataTypes.INTEGER,
-    eventId: DataTypes.INTEGER
+   stage_event_id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+   },
+   stage_event_start_time: {
+    type: DataTypes.DATE,
+    allowNull: false
+   },
+   stage_event_end_time: {
+    type: DataTypes.DATE,
+    allowNull: false
+   }
   }, {
     sequelize,
     modelName: 'stage_event',
+    tableName: 'meet_greets',
+    timestamps: false
   });
   return stage_event;
 };
