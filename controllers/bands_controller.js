@@ -1,5 +1,5 @@
 // dependencies
-const express = require('express');
+const express = require('express')
 const router = express.Router();
 const { Op } = require('sequelize');
 const db = require('../models');
@@ -8,12 +8,7 @@ const { Band } = db;
 // FIND ALL BANDS
 router.get('/', async (req, res) => {
     try {
-        const foundBands = await Band.findAll({
-            order: [['available_start_time', 'ASC']],
-            where: {
-                name: { [Op.like]: `%${req.query.name ? req.query.name : ''}%` }
-            }
-        });
+        const foundBands = await Band.findAll();
         res.status(200).json(foundBands);
     } catch (error) {
         res.status(500).json(error);
@@ -21,12 +16,34 @@ router.get('/', async (req, res) => {
 });
 
 
-// FIND A BAND
-router.get('/:id', async (req, res) => {
+// FIND A SPECIFIC BAND
+router.get('/:name', async (req, res) => {
     try {
         const foundBand = await Band.findOne({
-            where: { band_id: req.params.id }
-        });
+            where: { name: req.params.name },
+            include: [
+                {
+                    model: MeetGreet,
+                    as: "meet_greets",
+                    attribute: { exclude: ["band_id", "event_id"] },
+                    include: {
+                        model: Event,
+                        as: "event",
+                        where: { name: { [Op.like]: `%${req.query.event ? req.query.event : ''}%` } }
+                    }
+                },
+                {
+                    model: SetTime,
+                    as: "set_times",
+                    attribute: { exclude: ["band_id", "event_id"] },
+                    include: {
+                        model: Event,
+                        as: "event",
+                        where: { name: { [Op.like]: `%${req.query.event ? req.query.event : ''}%` } }
+                    }
+                }
+            ]
+        })
         res.status(200).json(foundBand);
     } catch (error) {
         res.status(500).json(error);

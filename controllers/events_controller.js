@@ -5,12 +5,11 @@ const db = require('../models');
 const { Event } = db;
 
 // INDEX
-router.get('/', async (req, res) => {
+router.get('/:name', async (req, res) => {
   try {
-    const events = await Event.findAll({
-      order: [['date', 'ASC']],
+    const foundEvents = await Event.findOne({
       where: {
-        name: { [Op.like]: `%${req.query.name}%` }
+        name: { name: req.params.name }
       }
     });
     res.status(200).json(events);
@@ -20,9 +19,9 @@ router.get('/', async (req, res) => {
 });
 
 // SHOW
-router.get('/:id', async (req, res) => {
+router.get('/:name', async (req, res) => {
   try {
-    const event = await Event.findByPk(req.params.id);
+    const foundEvent = await Event.findOne(req.params.id);
     if (event) {
       res.status(200).json(event);
     } else {
